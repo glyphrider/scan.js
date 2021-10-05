@@ -21,12 +21,17 @@ async function fetch(owner, project, version) {
 				respStream += d;
 			},
 				res.on('close', d => {
-					var jsonData = JSON.parse(respStream);
-					var license = jsonData.license;
-					if (license == undefined)
-						license = jsonData.licenses;
-					if (license == undefined)
-						license = 'N/A';
+					var license = undefined;
+					try {
+						var jsonData = JSON.parse(respStream);
+						license = jsonData.license;
+						if (license == undefined)
+							license = jsonData.licenses;
+						if (license == undefined)
+							license = 'N/A';
+					} catch(error) {
+						console.log(`*** error parsing json at ${url}`);
+					}
 					resolve({ owner: owner, project: project, version: version, license: license, url: url });
 				}));
 		});
@@ -62,14 +67,6 @@ rl.on('line', line => {
 				var match = line.match(/^  version "([^"]*)"/);
 				var version = match[1];
 				packages.push({owner: owner, project: project, version: version});
-				// fetch(owner,project, version).then(
-				// 	function(result) {
-				// 		console.log(`${result.owner}/${result.project} (${result.version}) --> ${JSON.stringify(result.license)} from ${result.url}`)
-				// 	},
-				// 	function(error) {
-				// 		console.log("poop");
-				// 	});
-				// console.log("owner = " + owner + " project = "+project+ " version = " + match[1]);
 			} else if(/^"?@/.test(line)) {
 				var match = line.match(/^"?(@[^\/]*)\/([^@]*)/);
 				owner = match[1];
@@ -93,16 +90,6 @@ rl.on('line', line => {
 			);
 			},100*i);
 		});
-					/*
-		for (var dep in jsonParsed.dependencies) {
-			fetch(dep, jsonParsed.dependencies[dep].version).then(
-				function (result) {
-					console.log(`${result.name} (${result.version}) --> ${JSON.stringify(result.license)} from ${result.url}`);
-				},
-				function (error) { }
-			);
-		}
-		*/
 	});
 });
 

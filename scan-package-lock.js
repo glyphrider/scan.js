@@ -7,10 +7,10 @@ var csvData = "";
 var i = 0;
 
 async function fetch(package_arg, version_arg) {
-  let package = package_arg;
-  let version = version_arg;
-  await new Promise((r) => setTimeout(r, 200 * i++));
+  await new Promise((r) => setTimeout(r, 20 * i++));
   return new Promise((resolve) => {
+    let package = package_arg;
+    let version = version_arg;
     let url = `https://registry.npmjs.org/${package}/${version}`;
     let respStream = "";
     const req = https.get(url, (res) => {

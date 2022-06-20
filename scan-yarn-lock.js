@@ -49,7 +49,6 @@ async function fetch(owner_arg, project_arg, version_arg) {
     });
     req.on("error", (error) => {
       console.log(`*** error at ${url} =>> ${JSON.stringify(error)}`);
-      // resolve(fetch(owner,project,version,retries));
     });
     req.end();
   });
@@ -78,8 +77,6 @@ rl.on("line", (filename) => {
       } else if (/^  version /.test(line)) {
         var match = line.match(/^  version "([^"]*)"/);
         var version = match[1];
-        console.log(`  adding ${project}`);
-        // packages.push({ owner: owner, project: project, version: version });
         fetch(owner, project, version).then(
           function (result) {
             console.log(

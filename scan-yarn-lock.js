@@ -51,14 +51,14 @@ var rl = readline.createInterface({
 	terminal: false
 });
 
+var packages = [];
+
 rl.on('line', line => {
 	fs.readFile(line, function (err, data) {
 		lines = data.toString().split(/\r?\n/);
-		var packages = [];
 		var owner = "";
 		var project = "";
 		lines.forEach((line) => {
-			
 			if(/^#/.test(line) // skip comments
 			  || /^\s*$/.test(line) // skip blank lines
 			  ) {
@@ -77,19 +77,20 @@ rl.on('line', line => {
 			  	project = match[1];
 			}
 		});
-
-		packages.forEach((pkg,i) => {
-			setTimeout(function() {
-			fetch(pkg.owner, pkg.project, pkg.version).then(
-				function(result) {
-					console.log(`${result.owner}/${result.project} (${result.version}) --> ${JSON.stringify(result.license)} from ${result.url}`)
-				},
-				function(error) {
-					console.log("poop");
-				}
-			);
-			},100*i);
-		});
 	});
 });
+
+packages.forEach((pkg,i) => {
+	setTimeout(function() {
+	fetch(pkg.owner, pkg.project, pkg.version).then(
+		function(result) {
+			console.log(`${result.owner}/${result.project} (${result.version}) --> ${JSON.stringify(result.license)} from ${result.url}`)
+		},
+		function(error) {
+			console.log("poop");
+		}
+	);
+	},200*i);
+});
+
 

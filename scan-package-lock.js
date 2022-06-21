@@ -4,11 +4,14 @@ var readline = require("readline");
 
 var csvData = "";
 
+// console.log(`"Name","Version","License","package-lock.json","URL"`);
+
 var i = 0;
 
-async function fetch(package_arg, version_arg) {
+async function fetch(filename_arg, package_arg, version_arg) {
   await new Promise((r) => setTimeout(r, 20 * i++));
   return new Promise((resolve) => {
+	let filename = filename_arg;
     let package = package_arg;
     let version = version_arg;
     let url = `https://registry.npmjs.org/${package}/${version}`;
@@ -29,6 +32,7 @@ async function fetch(package_arg, version_arg) {
             version: version,
             license: license,
             url: url,
+			filename: filename,
           });
         })
       );
@@ -48,19 +52,20 @@ var rl = readline.createInterface({
   terminal: false,
 });
 
-rl.on("line", (line) => {
-  fs.readFile(line, function (err, data) {
+rl.on("line", (filename) => {
+  fs.readFile(filename, function (err, data) {
     let jsonData = data;
     let jsonParsed = JSON.parse(jsonData);
     for (var dep in jsonParsed.dependencies) {
       let version = jsonParsed.dependencies[dep].version;
-      fetch(dep, version).then(
+      fetch(filename, dep, version).then(
         function (result) {
           console.log(
             `${result.name} (${result.version}) --> ${JSON.stringify(
               result.license
             )} from ${result.url}`
           );
+        //   console.log(`"${result.name}","${result.version}",${typeof result.license === 'string' ? '"' + result.license + '"' : JSON.stringify(result.license)},"${result.filename}","${result.url}"`);
         },
         function (error) {
           console.log(`*** ${error.message} ***`);
